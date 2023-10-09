@@ -29,7 +29,7 @@ class SerialReader(QThread):
     def run(self):
         while True:
             if self.serial_port.is_open:
-                data = self.serial_port.readline.decode().strip()
+                data = self.serial_port.readline().decode().strip()
                 self.data_received.emit(data)
 
 
@@ -38,7 +38,7 @@ class IndexPage(QWidget):
         super(IndexPage, self).__init__()
         self.initUI()
 
-        self.serial_reader = SerialReader('COM3', 9600)
+        self.serial_reader = SerialReader('/dev/cu.usbmodem0740D1DC33491', 115200)
         self.serial_reader.data_received.connect(self.update_plots)
 
         self.serial_reader.start()
@@ -48,11 +48,11 @@ class IndexPage(QWidget):
             pg.PlotWidget() for i in range(5)
         ]
 
-        graph_widgets[0].setTitle('Thumb')
-        graph_widgets[1].setTitle('Index')
-        graph_widgets[2].setTitle('Middle')
-        graph_widgets[3].setTitle('Ring')
-        graph_widgets[4].setTitle('Pinky')
+        graph_widgets[0].setTitle('Thumb - Duim')
+        graph_widgets[1].setTitle('Index - Wijsvinger')
+        graph_widgets[2].setTitle('Middle - Middelvinger')
+        graph_widgets[3].setTitle('Ring - Ringvinger')
+        graph_widgets[4].setTitle('Pinky - Pink')
 
         pen = pg.mkPen(color=(255,0,0))
         self.graph_data = [
@@ -82,7 +82,7 @@ class IndexPage(QWidget):
         self.next_prompt_button.clicked.connect(self.next_prompt)
         self.next_prompt_button.setEnabled(False)
 
-        label = QLabel('Please perform the handmotions to get this result:')
+        label = QLabel('Data collected for each finger')
         self.category = QLabel('')
         self.text = QPlainTextEdit('(Aici o sa vina textul, acum e doar asta, Lorem ipsum ceva ceva)')
         self.text.setReadOnly(True)
@@ -98,7 +98,7 @@ class IndexPage(QWidget):
 
     def initUI(self):
         layout = QHBoxLayout()
-        self.setWindowTitle('Glove Index')
+        self.setWindowTitle('ChatterGlove Data Acquisition - ChatterGlove-gegevensverzameling')
         self.setGeometry(100, 100, 1600, 900)
         
         graphs_layout = self.init_graphs()
@@ -120,19 +120,16 @@ class IndexPage(QWidget):
             category, prompt_text = next(self.prompt_generator)
             self.text.setPlainText(prompt_text)
             self.category.setText(f'Category: {category}')
-            self.update_plots_testing()
         except StopIteration:
             self.next_prompt_button.setEnabled(False)
             self.text.setPlainText('All done!')
 
-    def update_plots_testing(self):
+    def update_plots(self, data):
+        values = list(map(lambda x: float(x), data.split(' ')))
         for gi in range(5):
             if len(self.graph_data[gi][0]) > 50:
                 self.graph_data[gi][0] = self.graph_data[gi][0][1:]
                 self.graph_data[gi][1] = self.graph_data[gi][1][1:]
             self.graph_data[gi][0].append(self.graph_data[gi][0][-1] + 1)
-            self.graph_data[gi][1].append(random.randint(0, 100))
+            self.graph_data[gi][1].append(values[gi])
             self.graph_data[gi][2].setData(self.graph_data[gi][0], self.graph_data[gi][1])
-
-    def update_plots(self, data):
-        pass
