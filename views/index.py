@@ -3,6 +3,7 @@ import serial
 import random
  
 from PyQt5 import QtCore
+from PyQt5 import QtGui
  
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
@@ -65,7 +66,7 @@ class IndexPage(QWidget):
         graph_widgets[2].setTitle('Middle - Middelvinger')
         graph_widgets[3].setTitle('Ring - Ringvinger')
         graph_widgets[4].setTitle('Pinky - Pink')
-        graph_widgets[5].setTitle('Hand Motion')
+        graph_widgets[5].setTitle('Hand Motion - Handbeweging')
  
         pen = pg.mkPen(color=(255,0,0))
         self.graph_data = [
@@ -92,18 +93,24 @@ class IndexPage(QWidget):
     def init_controls(self):
         control_layout = QVBoxLayout()
  
-        start_session_button = QPushButton('Start session')
+        start_session_button = QPushButton('Start')
         start_session_button.clicked.connect(self.start_session)
-        self.next_prompt_button = QPushButton('Next prompt')
+        self.next_prompt_button = QPushButton('Next')
         self.next_prompt_button.clicked.connect(self.next_prompt)
         self.next_prompt_button.setEnabled(False)
  
-        label = QLabel('Data collected for each finger')
+        label_en = QLabel('Data collected for the hand and each finger')
+        label_dt = QLabel('Verzamelde gegevens voor de hand en elke vinger')
         self.category = QLabel('')
-        self.text = QPlainTextEdit('(Aici o sa vina textul, acum e doar asta, Lorem ipsum ceva ceva)')
+        self.text = QPlainTextEdit('Wij zijn het team van de ChatterGlove en dit is onze gegevensverzamelingstoepassing voor het trainen van de handschoen.')
         self.text.setReadOnly(True)
+        
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.text.setFont(font)
  
-        control_layout.addWidget(label)
+        control_layout.addWidget(label_en)
+        control_layout.addWidget(label_dt)
         control_layout.addWidget(self.category)
         control_layout.addWidget(self.text)
  
@@ -165,6 +172,7 @@ class IndexPage(QWidget):
  
     def update_plots(self, data):
         if self.running:
+            print(data)
             values = list(map(lambda x: float(x), data.split(' ')))
             response = session.put_result_data(
                 self.current_session_id,
@@ -181,7 +189,7 @@ class IndexPage(QWidget):
                 self.graph_data[gi][0].append(self.graph_data[gi][0][-1] + 1)
                 self.graph_data[gi][1].append(values[gi])
                 self.graph_data[gi][2].setData(self.graph_data[gi][0], self.graph_data[gi][1])
-            for x in range(3):
+            for gi in range(3):
                 if (len(self.gyro_data[gi][0])) > 50:
                     self.gyro_data[gi][0] = self.gyro_data[gi][0][1:]
                     self.gyro_data[gi][1] = self.gyro_data[gi][1][1:]
