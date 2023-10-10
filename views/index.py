@@ -174,6 +174,9 @@ class IndexPage(QWidget):
         if self.running:
             print(data)
             values = list(map(lambda x: float(x), data.split(' ')))
+            gyro_values = values[5:]
+            values = values[:5]
+            values.append(gyro_values)
             response = session.put_result_data(
                 self.current_session_id,
                 self.current_order_number,
