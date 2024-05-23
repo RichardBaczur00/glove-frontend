@@ -48,11 +48,11 @@ class IndexPage(QWidget):
             pg.PlotWidget() for i in range(5)
         ]
 
-        graph_widgets[0].setTitle('Thumb - Duim')
-        graph_widgets[1].setTitle('Index - Wijsvinger')
-        graph_widgets[2].setTitle('Middle - Middelvinger')
-        graph_widgets[3].setTitle('Ring - Ringvinger')
-        graph_widgets[4].setTitle('Pinky - Pink')
+        graph_widgets[0].setTitle('Thumb - Degetul Mare')
+        graph_widgets[1].setTitle('Index - Degetul Aratator')
+        graph_widgets[2].setTitle('Middle - Degetul Mijlociu')
+        graph_widgets[3].setTitle('Ring - Degetul Inelar')
+        graph_widgets[4].setTitle('Pinky - Degetul Mic')
 
         pen = pg.mkPen(color=(255,0,0))
         self.graph_data = [
